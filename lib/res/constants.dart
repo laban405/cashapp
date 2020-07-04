@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 //theme colors
 Color dark1 = const Color(0xFF051A1F);
 Color blue1 = const Color(0xFF047CBF);
+Color blue2 = const Color(0xFF127bb5);
 Color dark2 = const Color(0xFF161629);
 Color dark3 = const Color(0xFF222233);
 Color cyan = const Color(0xFF1fbad6);
