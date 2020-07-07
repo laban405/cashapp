@@ -50,7 +50,7 @@ class _LoginState extends State<Login> {
                   TextFormField(
                     validator: (value) {
                       if(value.length<4){
-                        return 'Enter correct username';
+                        return 'Enter correct email';
                       }
                       return null;
                     },
@@ -60,7 +60,7 @@ class _LoginState extends State<Login> {
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       contentPadding:EdgeInsets.only(bottom: 0.2*heightm, top: 1*heightm),
-                      hintText: 'Username',
+                      hintText: 'Email',
                       hintStyle: TextStyle(color: Colors.white),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),

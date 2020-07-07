@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-final String _ipaddress = "http://192.168.0.195:8080";
+final String _ipaddress = "http://18.191.152.10:8080";
 final String _contextPath = '/api/';
 final String _url = _ipaddress + _contextPath;
 

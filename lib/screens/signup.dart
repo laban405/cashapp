@@ -40,7 +40,7 @@ class _SignupState extends State<Signup> {
                     height: 1 * heightm,
                   ),
                   Text(
-                    'USERNAME',
+                    'FULL NAME',
                     style: TextStyle(color: Colors.grey, fontSize: 1.5 * textm),
                   ),
                   TextFormField(
@@ -57,7 +57,7 @@ class _SignupState extends State<Signup> {
                     decoration: InputDecoration(
                       contentPadding:EdgeInsets.only(bottom: 0.2*heightm, top: 1*heightm),
                       isDense: true,
-                      hintText: 'Username',
+                      hintText: 'Full Name',
                       hintStyle: TextStyle(color: Colors.white),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
