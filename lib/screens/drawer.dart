@@ -131,7 +131,7 @@ drawerFunction(BuildContext context) {
               Navigator.push(
                   context,
                   PageTransition(
-                      child: SendMoney(),
+                      child: BrainTreeSample(),
                       type: PageTransitionType.leftToRight));
             },
           ),
