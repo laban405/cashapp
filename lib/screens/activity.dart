@@ -1,6 +1,7 @@
 import 'package:cashapp/apis/activityapi.dart';
 import 'package:cashapp/res/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class Activity extends StatefulWidget {
   @override
@@ -32,14 +33,12 @@ class _ActivityState extends State<Activity> {
                   'Activity',
                   style: TextStyle(
                     fontSize: 3 * textm,
-                    color: Colors.white,
+                    color: blue1,
                   ),
                 ),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Container())
+            Expanded(flex: 1, child: Container())
           ],
         ),
       ),
@@ -49,7 +48,6 @@ class _ActivityState extends State<Activity> {
         child: FutureBuilder<List<ActivityData>>(
             future: fetchActivities(),
             builder: (context, snapshot) {
-              
               if (snapshot.hasError) print(snapshot.error);
 
               return snapshot.hasData
@@ -58,7 +56,7 @@ class _ActivityState extends State<Activity> {
                       shrinkWrap: true,
                       physics: const ClampingScrollPhysics(),
                       itemCount: snapshot.data.length,
-                      itemExtent: 10 * heightm,
+                      itemExtent: 14 * heightm,
                       // reverse: true, //makes the list appear in descending order
                       itemBuilder: (BuildContext context, int index) {
                         return activityDetails(snapshot.data, index);
@@ -76,53 +74,79 @@ class _ActivityState extends State<Activity> {
 
   Widget activityDetails(List<ActivityData> data, int index) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 3 * widthm),
-      child: Card(
-        color: Colors.grey[300],
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundColor: Colors.grey,
-          ),
-          title: Row(
+      padding: EdgeInsets.symmetric(horizontal: 1 * widthm),
+      child: Container(
+          color: dark1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Expanded(
-                flex: 2,
-                              child: Text(
-                  '${data[index].phone}',
-                  style: TextStyle(
-                    fontSize: 2.3 * textm,
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.w600
+              ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: blue1,
                   ),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                              child: Text(
-                  '${data[index].debit <= 0 ? data[index].credit.toString() : data[index].debit.toString()}',
-                  style: TextStyle(
-                    fontSize: 2.3 * textm,
-                    color:
-                        data[index].debit <= 0 ? Colors.green : Colors.red[600],
+                  title: Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          '${data[index].phone}',
+                          style: TextStyle(
+                              fontSize: 2 * textm,
+                              color: Colors.grey[300],
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          '\$ ${data[index].debit <= 0 ? data[index].credit.toString() : data[index].debit.toString()}',
+                          style: TextStyle(
+                            fontSize: 2* textm,
+                            fontWeight: FontWeight.w800,
+                            color: data[index].debit <= 0
+                                ? Colors.green
+                                : Colors.red[600],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
+                  subtitle: Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 3,
+                          child: Text(
+                            '${data[index].activity}',
+                            style: TextStyle(
+                              fontSize: 1.8 * textm,
+                              color: Colors.grey[500],
+                            ),
+                          ),),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          '${data[index].date}',
+                          style: TextStyle(
+                            fontSize: 1.8 * textm,
+                            color: Colors.grey[500],
+                          ),
+                        ),),
+
+
+                    ],
+                  )
+                  //trailing: Icon(Icons.keyboard_arrow_right),
+                  // onTap: () {
+                  //   print('horse');
+                  // },
+                  // selected: true,
+                  ),
+              Divider(
+                height: .1 * heightm,
+                color: blue1,
+              )
             ],
-          ),
-          subtitle: Text(
-            '${data[index].narration}',
-            style: TextStyle(
-              fontSize: 2.0 * textm,
-              color: Colors.grey[500],
-            ),
-          ),
-          //trailing: Icon(Icons.keyboard_arrow_right),
-          // onTap: () {
-          //   print('horse');
-          // },
-          // selected: true,
-        ),
-      ),
+          )),
     );
   }
 }

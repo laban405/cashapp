@@ -12,17 +12,18 @@ import 'package:flutter_numpad_widget/flutter_numpad_widget.dart';
 
 import 'package:native_contact_picker/native_contact_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SendMoney extends StatefulWidget {
+class WithdrawMoney extends StatefulWidget {
   @override
-  _SendMoneyState createState() => _SendMoneyState();
+  _WithdrawMoneyState createState() => _WithdrawMoneyState();
 }
 
-class _SendMoneyState extends State<SendMoney> {
+class _WithdrawMoneyState extends State<WithdrawMoney> {
   final NativeContactPicker _contactPicker = NativeContactPicker();
   Contact _contact;
   final NumpadController _numpadController =
-      NumpadController(hintText: "Enter amount",format: NumpadFormat.NONE);
+  NumpadController(hintText: "Enter amount",format: NumpadFormat.NONE);
   bool _isLoading = false;
 
   @override
@@ -48,7 +49,7 @@ class _SendMoneyState extends State<SendMoney> {
               flex: 4,
               child: Center(
                 child: Text(
-                  'Send Money',
+                  'Withdraw Money',
                   style: TextStyle(
                     fontSize: 3 * textm,
                     color: blue1,
@@ -67,50 +68,11 @@ class _SendMoneyState extends State<SendMoney> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                InkWell(
-                  onTap: () async {
-                    Contact contact = await _contactPicker.selectContact();
-                    setState(() {
-                      _contact = contact;
-                    });
-                  },
-                  child: SizedBox(
-                    height: 8 * heightm,
-                    width: 55 * widthm,
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.add_circle,
-                          size: 8 * widthm,
-                          color: Colors.grey[500],
-                        ),
-                        Text(
-                          _contact == null
-                              ? '  CHOOSE RECIPIENT'
-                              : '  CHANGE RECIPIENT',
-                          textScaleFactor: 1,
-                          style: TextStyle(
 
-                              fontSize: 1.8 * textm,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
                 SizedBox(
                   height: 2 * heightm,
                 ),
-                Text(
-                  _contact == null
-                      ? 'No contact selected.'
-                      : _contact.phoneNumber.toString(),
-                  style: TextStyle(
-                      fontSize: 2.8 * textm,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700),
-                ),
+
                 Expanded(
                   flex: 2,
                   child: Padding(
@@ -119,7 +81,7 @@ class _SendMoneyState extends State<SendMoney> {
                       alignment: Alignment.bottomCenter,
                       child: NumpadText(
                         style:
-                            TextStyle(fontSize: 5 * textm, color: Colors.white),
+                        TextStyle(fontSize: 5 * textm, color: Colors.white),
                         controller: _numpadController,
                       ),
                     ),
@@ -152,17 +114,17 @@ class _SendMoneyState extends State<SendMoney> {
                           onPressed: _isLoading
                               ? null
                               : () {
-                                  sendVirtualMoney(balanceBloc);
-                                },
+                            withdrawVirtualMoney(balanceBloc);
+                          },
                           child: _isLoading
                               ? spinkitwhite
                               : Text(
-                                  'SEND',
-                                  style: TextStyle(
-                                    fontSize: 2.5 * textm,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                              'WITHDRAW',
+                            style: TextStyle(
+                              fontSize: 2.5 * textm,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     )
@@ -174,28 +136,34 @@ class _SendMoneyState extends State<SendMoney> {
     );
   }
 
-  sendVirtualMoney( BalanceBloc balanceBloc) async {
+ withdrawVirtualMoney( BalanceBloc balanceBloc) async {
     setState(() {
       _isLoading = true;
     });
 
-    var phone_number=_contact.phoneNumber.replaceAll(new RegExp(r"\s+"), "");
-    var payeephone=phone_number.replaceAll(new RegExp(r'[^\w\s]+'),'');
+    //var phone_number=_contact.phoneNumber.replaceAll(new RegExp(r"\s+"), "");
+    //var payeephone=phone_number.replaceAll(new RegExp(r'[^\w\s]+'),'');
 
     try {
-      var data = {
+      var myphone;
+      localStorage = await SharedPreferences.getInstance();
+      setState(() {
+        myphone = localStorage.getString('phone');
+      });
+
+      var data={
         "amount": _numpadController.formattedString,
-        "narration": "Send Money to $payeephone",
-        "payee_phone_number": payeephone
+        "narration": "Withdraw money",
+        "payee_phone_number": myphone
       };
       print('data is $data');
 
       var res =
-          await postData(data, 'send-money').timeout(const Duration(seconds: 30));
+      await postData(data, 'withdrawal-money').timeout(const Duration(seconds: 30));
       var body = json.decode(res.body);
 
-      print('send money response is ${res.body}');
-      print('send money response is ${res.statusCode}');
+      print('withdraw money response is ${res.body}');
+      print('withdraw money response is ${res.statusCode}');
       if (res.statusCode == 200) {
         var _res = await getData('users');
         var profilebody = json.decode(_res.body);
@@ -207,16 +175,6 @@ class _SendMoneyState extends State<SendMoney> {
         }
         showToast(context, '${body['message']}');
       } else {
-
-        var _res = await getData('users');
-        var profilebody = json.decode(_res.body);
-
-        print('profile status code ${_res.statusCode}');
-        print('profile data $profilebody');
-
-        if(_res.statusCode==200) {
-          balanceBloc.updateBalance(profilebody['account_balance']);
-        }
         showToast(context, '${body['message']}');
       }
     } on TimeoutException {
@@ -226,5 +184,71 @@ class _SendMoneyState extends State<SendMoney> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  withdrawSuccess(){
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: blue1,
+        title: Center(
+          child: Text(
+            'Funds Deposit Successful',
+            style: TextStyle(
+              fontSize: 2.3 * textm,
+              color: dark1,
+            ),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'You have successfully deposited',
+              style: TextStyle(
+                fontSize: 1.8 * textm,
+                color: dark1,
+              ),
+            ),
+            Text("jjjj",
+              //'\$ ${body['content']['credit'].toString()}',
+              style: TextStyle(
+                fontSize: 3 * textm,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              'to your Junubi account',
+              style: TextStyle(
+                fontSize: 1.8 * textm,
+                color: dark1,
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            SizedBox(
+              height: 6*heightm,
+              width: 40*widthm,
+              child: FlatButton(
+                color: dark1,
+                onPressed: (){
+                  Navigator.pop(context);
+                  //Navigator.pushReplacement(context, newRoute)
+
+                },
+                child:Text(
+                  'Finish',
+                  style: TextStyle(
+                    fontSize: 1.8* textm,
+                    color: blue1,
+                  ),
+                ),),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

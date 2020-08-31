@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-
-final String _ipaddress = "http://18.191.152.10:8081";
+final String ipaddress="http://54.202.230.57:8081/";
+final String _ipaddress = "http://54.202.230.57:8081";
 final String _contextPath = '/api/';
 final String _url = _ipaddress + _contextPath;
 
@@ -34,9 +34,17 @@ Future<String> requestToken(String phonev, String passwordv) async {
 }
 
 Future<dynamic> postData(data, apiUrl) async {
+  print('access token>>$accesstoken');
   var fullUrl = _url + apiUrl;
   return await http.post(fullUrl,
       body: jsonEncode(data), headers: _setHeaders());
+}
+
+Future<dynamic> postNoData(apiUrl) async {
+  var fullUrl = _url + apiUrl;
+  return await http.post(fullUrl,
+      //body: jsonEncode(data),
+      headers: _setHeaders());
 }
 
 Future<dynamic> resetPassword(data, apiUrl) async {
@@ -46,11 +54,19 @@ Future<dynamic> resetPassword(data, apiUrl) async {
 }
 
 Future<dynamic> getData(apiUrl) async {
+  print('access token>>$accesstoken');
   var fullUrl = _url + apiUrl;
   return await http.get(fullUrl, headers: _setHeaders());
 }
 
+Future<dynamic> getDataRegister(apiUrl) async {
+  print('access token>>$accesstoken');
+  var fullUrl = _url + apiUrl;
+  return await http.get(fullUrl, headers: _registersetHeaders());
+}
+
 Future<dynamic> putData(data, apiUrl) async {
+
   var fullUrl = _url + apiUrl;
   // make PUT request
   return await put(fullUrl, headers: _setHeaders(), body: jsonEncode(data));

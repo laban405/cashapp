@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cashapp/res/commonwidgets.dart';
 import 'package:cashapp/res/constants.dart';
+import 'package:cashapp/screens/home.dart';
 import 'package:cashapp/screens/login.dart';
 import 'package:flutter/material.dart';
 

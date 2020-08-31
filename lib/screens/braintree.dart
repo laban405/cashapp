@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:cashapp/apis/httprequestsapi.dart';
+import 'package:cashapp/screens/tokengen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
-
 
 class BrainTreeSample extends StatefulWidget {
   @override
@@ -13,16 +13,17 @@ class BrainTreeSample extends StatefulWidget {
 class _BrainTreeSampleState extends State<BrainTreeSample> {
   static final String tokenizationKey = 'sandbox_rzdmq5vp_kyktcybpfgq5b99r';
   String clientToken;
+  double depositamt = 20;
 
-  void showNonce(BraintreePaymentMethodNonce nonce) async{
-    var data={
-      "amount": 20,
-      "payment_method_nonce": nonce.nonce
-    };
+  void showNonce(BraintreePaymentMethodNonce nonce) async {
+    var data = {"amount": 20, "payment_method_nonce": nonce.nonce};
+    print('nonce itself $nonce');
     print('n0nce data>>>> paypal is $data');
-
-    var res= await postData(data, 'paypal-deposit');
-    print('responce paypal is ${res.body}');
+    print('start paypal deposit');
+    var res = await postNoData(
+        'make-payment?amount=$depositamt&payment_method_nonce=${nonce.nonce}');
+    print('end paypal deposit');
+    print('response paypal is ${res.body}');
 //    showDialog(
 //      context: context,
 //      builder: (_) => AlertDialog(
@@ -47,11 +48,12 @@ class _BrainTreeSampleState extends State<BrainTreeSample> {
 //    );
   }
 
-  getClientToken()async{
-    var res= await getData('client-token');
-    var body= json.decode(res.body);
+  getClientToken() async {
+    var res = await getData('payment/token');
+    var body = json.decode(res.body);
+    print('response client token${body}');
 
-    clientToken=body['content']['client_token'];
+    clientToken = body['clientToken'];
     print('client token is $clientToken');
   }
 
@@ -75,7 +77,8 @@ class _BrainTreeSampleState extends State<BrainTreeSample> {
             RaisedButton(
               onPressed: () async {
                 var request = BraintreeDropInRequest(
-                 clientToken: clientToken,
+                  cardEnabled: false,
+                  clientToken: clientToken,
                   tokenizationKey: tokenizationKey,
                   collectDeviceData: true,
 //                  googlePaymentRequest: BraintreeGooglePaymentRequest(
@@ -83,14 +86,16 @@ class _BrainTreeSampleState extends State<BrainTreeSample> {
 //                    currencyCode: 'USD',
 //                    billingAddressRequired: false,
 //                  ),
-                  paypalRequest: BraintreePayPalRequest(currencyCode: 'USD',
+                  paypalRequest: BraintreePayPalRequest(
+                    currencyCode: 'USD',
                     amount: '4.20',
-                    displayName: 'Example company',
+                    displayName: 'Junubi App',
                   ),
                 );
                 BraintreeDropInResult result =
                     await BraintreeDropIn.start(request);
                 if (result != null) {
+                  print('result got back including nonce $result');
                   showNonce(result.paymentMethodNonce);
                 }
               },
@@ -125,10 +130,10 @@ class _BrainTreeSampleState extends State<BrainTreeSample> {
                 );
                 BraintreePaymentMethodNonce result =
                     await Braintree.requestPaypalNonce(
-                      clientToken,
+                  tokengen,
 
-                 //tokenizationKey,
-                 request,
+                  //tokenizationKey,
+                  request,
                 );
                 if (result != null) {
                   showNonce(result);
@@ -138,13 +143,10 @@ class _BrainTreeSampleState extends State<BrainTreeSample> {
             ),
             RaisedButton(
               onPressed: () async {
-                final request = BraintreePayPalRequest(
-
-                    amount: '13.37'
-                );
+                final request = BraintreePayPalRequest(amount: '13.37');
                 BraintreePaymentMethodNonce result =
                     await Braintree.requestPaypalNonce(
-                  clientToken,
+                  tokengen,
                   request,
                 );
                 if (result != null) {

@@ -13,16 +13,16 @@ import 'package:flutter_numpad_widget/flutter_numpad_widget.dart';
 import 'package:native_contact_picker/native_contact_picker.dart';
 import 'package:provider/provider.dart';
 
-class SendMoney extends StatefulWidget {
+class PayMoney extends StatefulWidget {
   @override
-  _SendMoneyState createState() => _SendMoneyState();
+  _PayMoneyState createState() => _PayMoneyState();
 }
 
-class _SendMoneyState extends State<SendMoney> {
+class _PayMoneyState extends State<PayMoney> {
   final NativeContactPicker _contactPicker = NativeContactPicker();
   Contact _contact;
   final NumpadController _numpadController =
-      NumpadController(hintText: "Enter amount",format: NumpadFormat.NONE);
+  NumpadController(hintText: "Enter amount",format: NumpadFormat.NONE);
   bool _isLoading = false;
 
   @override
@@ -48,7 +48,7 @@ class _SendMoneyState extends State<SendMoney> {
               flex: 4,
               child: Center(
                 child: Text(
-                  'Send Money',
+                  'Pay',
                   style: TextStyle(
                     fontSize: 3 * textm,
                     color: blue1,
@@ -88,9 +88,7 @@ class _SendMoneyState extends State<SendMoney> {
                           _contact == null
                               ? '  CHOOSE RECIPIENT'
                               : '  CHANGE RECIPIENT',
-                          textScaleFactor: 1,
                           style: TextStyle(
-
                               fontSize: 1.8 * textm,
                               color: Colors.grey[600],
                               fontWeight: FontWeight.w700),
@@ -119,7 +117,7 @@ class _SendMoneyState extends State<SendMoney> {
                       alignment: Alignment.bottomCenter,
                       child: NumpadText(
                         style:
-                            TextStyle(fontSize: 5 * textm, color: Colors.white),
+                        TextStyle(fontSize: 5 * textm, color: Colors.white),
                         controller: _numpadController,
                       ),
                     ),
@@ -145,24 +143,24 @@ class _SendMoneyState extends State<SendMoney> {
                         3 * widthm,
                       ),
                       child: SizedBox(
-                        height: 8 * heightm,
+                        height: 7 * heightm,
                         width: MediaQuery.of(context).size.width / 2,
                         child: FlatButton(
                           color: blue1,
                           onPressed: _isLoading
                               ? null
                               : () {
-                                  sendVirtualMoney(balanceBloc);
-                                },
+                            sendVirtualMoney(balanceBloc);
+                          },
                           child: _isLoading
                               ? spinkitwhite
                               : Text(
-                                  'SEND',
-                                  style: TextStyle(
-                                    fontSize: 2.5 * textm,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                            'Pay',
+                            style: TextStyle(
+                              fontSize: 2.5 * textm,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     )
@@ -185,13 +183,13 @@ class _SendMoneyState extends State<SendMoney> {
     try {
       var data = {
         "amount": _numpadController.formattedString,
-        "narration": "Send Money to $payeephone",
+        "narration": "Pay Money to $payeephone",
         "payee_phone_number": payeephone
       };
       print('data is $data');
 
       var res =
-          await postData(data, 'send-money').timeout(const Duration(seconds: 30));
+      await postData(data, 'pay-money').timeout(const Duration(seconds: 30));
       var body = json.decode(res.body);
 
       print('send money response is ${res.body}');
@@ -207,16 +205,6 @@ class _SendMoneyState extends State<SendMoney> {
         }
         showToast(context, '${body['message']}');
       } else {
-
-        var _res = await getData('users');
-        var profilebody = json.decode(_res.body);
-
-        print('profile status code ${_res.statusCode}');
-        print('profile data $profilebody');
-
-        if(_res.statusCode==200) {
-          balanceBloc.updateBalance(profilebody['account_balance']);
-        }
         showToast(context, '${body['message']}');
       }
     } on TimeoutException {

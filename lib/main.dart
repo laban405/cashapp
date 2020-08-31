@@ -1,6 +1,9 @@
+import 'package:cashapp/blocs/balance_bloc.dart';
 import 'package:cashapp/res/size_config.dart';
+import 'package:cashapp/screens/home.dart';
 import 'package:cashapp/screens/splashscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,13 +15,20 @@ class MyApp extends StatelessWidget {
       return OrientationBuilder(builder: (context, orientation) {
         SizeConfig().init(constraints, orientation);
 
-        return MaterialApp(
-          title: 'Cash App',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider<BalanceBloc>.value(value: BalanceBloc())
+          ],
+          child: MaterialApp(
+            title: 'Cash App',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: SplashScreen(),
+            routes: {
+             // Home.route: (context) => Home(),
+            },
           ),
-          home: SplashScreen(),
-          routes: {},
         );
       });
     });

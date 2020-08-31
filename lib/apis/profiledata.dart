@@ -9,17 +9,5 @@ SharedPreferences localStorage;
 String email;
 String lastlogin;
 String name;
+String currency;
 
-getProfileData() async {
-  try {
-    localStorage = await SharedPreferences.getInstance();
-    balance = localStorage.getString('balance');
-    phone = localStorage.getString('phone');
-    email=localStorage.getString('email');
-    lastlogin=localStorage.getString('lastlogin');
-    name=localStorage.getString('name');
-   // print('my token is $mytoken');
-  } catch (e) {
-    print('profile error $e');
-  }
-}

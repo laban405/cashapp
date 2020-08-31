@@ -2,12 +2,16 @@ import 'package:cashapp/apis/profiledata.dart';
 import 'package:cashapp/res/constants.dart';
 import 'package:cashapp/screens/activity.dart';
 import 'package:cashapp/screens/braintree.dart';
+import 'package:cashapp/screens/deposit.dart';
+import 'package:cashapp/screens/help.dart';
 import 'package:cashapp/screens/sendmoney.dart';
-import 'package:cashapp/screens/requestmoney.dart';
+import 'package:cashapp/screens/paymoney.dart';
 import 'package:cashapp/screens/samplecontacts.dart';
-import 'package:cashapp/services.dart/paypalpayment.dart';
+import 'package:cashapp/screens/withdraw.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+
+import 'login.dart';
 
 drawerFunction(BuildContext context) {
  
@@ -100,11 +104,11 @@ drawerFunction(BuildContext context) {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.get_app,
+            leading: Icon(Icons.payment,
             color: blue1,
             ),
             title: Text(
-                            'Request',
+                            'Pay',
                             style: TextStyle(
                               fontSize: 2.5*textm,
                               color: blue1,
@@ -114,7 +118,7 @@ drawerFunction(BuildContext context) {
               Navigator.push(
                   context,
                   PageTransition(
-                      child: RequestMoney(), type: PageTransitionType.leftToRight));
+                      child: PayMoney(), type: PageTransitionType.leftToRight));
             },
           ),
          
@@ -131,7 +135,7 @@ drawerFunction(BuildContext context) {
               Navigator.push(
                   context,
                   PageTransition(
-                      child: BrainTreeSample(),
+                      child: SendMoney(),
                       type: PageTransitionType.leftToRight));
             },
           ),
@@ -145,16 +149,28 @@ drawerFunction(BuildContext context) {
                             ),
                           ),
             onTap: () {
-              Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => PaypalPayment(
-                              onFinish: (number) async {
-
-                                // payment done
-                                print('order id: '+number);
-
-                              },
-                            )));
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      child: Deposit(),
+                      type: PageTransitionType.rightToLeft));
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.arrow_downward,color: blue1,),
+            title:  Text(
+              'Withdraw Funds',
+              style: TextStyle(
+                fontSize: 2.5*textm,
+                color: blue1,
+              ),
+            ),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      child: WithdrawMoney(),
+                      type: PageTransitionType.rightToLeft));
             },
           ),
           ListTile(
@@ -175,6 +191,22 @@ drawerFunction(BuildContext context) {
             },
           ),
           ListTile(
+            leading: Icon(Icons.help_outline,color: blue1,),
+            title: Text(
+              'Help',
+              style: TextStyle(
+                fontSize: 2.5*textm,
+                color: blue1,
+              ),
+            ),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      child: HelpSupport(), type: PageTransitionType.rightToLeft));
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.exit_to_app,color: blue1,),
             title: Text(
                             'Logout',
@@ -184,10 +216,10 @@ drawerFunction(BuildContext context) {
                             ),
                           ),
             onTap: () {
-              // Navigator.pushReplacement(
-              //     context,
-              //     PageTransition(
-              //         child: Login(), type: PageTransitionType.slideLeft));
+               Navigator.pushReplacement(
+                   context,
+                   PageTransition(
+                       child: Login(), type: PageTransitionType.rightToLeft));
             },
           ),
         ],

@@ -1,25 +1,56 @@
+import 'dart:math';
+
 import 'package:cashapp/apis/profiledata.dart';
+import 'package:cashapp/blocs/balance_bloc.dart';
 import 'package:cashapp/res/constants.dart';
 import 'package:cashapp/screens/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 GlobalKey<ScaffoldState> drawerKey = GlobalKey();
 
 
 class Home extends StatefulWidget {
+  static const String route = '/';
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
 
+  static int decimals = 2;
+  int fac = pow(10, decimals);
+
+
+
   @override
   void initState() {
     getProfileData();
     super.initState();
   }
+  getProfileData() async {
+    try {
+      localStorage = await SharedPreferences.getInstance();
+      setState(() {
+        balance = localStorage.getString('balance');
+        phone = localStorage.getString('phone');
+        email=localStorage.getString('email');
+        lastlogin=localStorage.getString('lastlogin');
+        name=localStorage.getString('name');
+        currency=localStorage.getString('currency');
+
+      });
+
+      // print('my token is $mytoken');
+    } catch (e) {
+      print('profile error $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
+    final BalanceBloc balanceBloc=Provider.of<BalanceBloc>(context);
+
     return Scaffold(
         key: drawerKey,
         drawer: Drawer(
@@ -49,7 +80,7 @@ class _HomeState extends State<Home> {
                   Padding(
                     padding: EdgeInsets.all(5 * widthm),
                     child: Text(
-                      'Junubi App',
+                      'Junubi Cash',
                       style: TextStyle(
                           fontSize: 3 * textm,
                           fontWeight: FontWeight.w700,
@@ -133,7 +164,9 @@ class _HomeState extends State<Home> {
                                   ),
                                 ),
                                 Text(
-                                  '\$ $balance',
+                                  '$currency ${balanceBloc.balance>0?balanceBloc.balance.toStringAsFixed(2):balanceBloc.balance}',
+
+                                  //'\$ ${balanceBloc.balance.toStringAsFixed(2) }',
                                   style: TextStyle(
                                     fontSize: 5 * textm,
                                     color: Colors.grey[400],
@@ -156,13 +189,13 @@ class _HomeState extends State<Home> {
                 SizedBox(
                   height: 2 * heightm,
                 ),
-                Text(
-                  '    Recent transactions',
-                  style: TextStyle(
-                    fontSize: 2 * textm,
-                    color: Colors.grey[400],
-                  ),
-                ),
+//                Text(
+//                  '    Recent transactions',
+//                  style: TextStyle(
+//                    fontSize: 2 * textm,
+//                    color: Colors.grey[400],
+//                  ),
+//                ),
               ],
             ),
           )
