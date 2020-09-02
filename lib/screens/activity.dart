@@ -1,5 +1,6 @@
 import 'package:cashapp/apis/activityapi.dart';
 import 'package:cashapp/res/constants.dart';
+import 'package:cashapp/screens/reverse.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -81,8 +82,23 @@ class _ActivityState extends State<Activity> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: blue1,
+                  leading: data[index].debit <= 0 ? CircleAvatar(
+                    backgroundColor: Colors.green,
+                    child:  Icon(Icons.done,
+                        color: Colors.white,
+                      )
+                  ):
+                  CircleAvatar(
+                    backgroundColor: Colors.lime,
+                    child: IconButton(icon: Icon(Icons.refresh,
+                      color: Colors.black,
+                    ), onPressed: (){
+                      showDialog(
+                          context: context,
+                          builder: (_) {
+                            return Reverse(trxid:data[index].trxid);
+                          });
+                    }),
                   ),
                   title: Row(
                     children: <Widget>[

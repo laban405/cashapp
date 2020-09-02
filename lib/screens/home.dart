@@ -164,7 +164,7 @@ class _HomeState extends State<Home> {
                                   ),
                                 ),
                                 Text(
-                                  '$currency ${balanceBloc.balance>0?balanceBloc.balance.toStringAsFixed(2):balanceBloc.balance}',
+                                  '$currency ${balanceBloc.balance.toStringAsFixed(2)}',
 
                                   //'\$ ${balanceBloc.balance.toStringAsFixed(2) }',
                                   style: TextStyle(

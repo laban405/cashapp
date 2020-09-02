@@ -9,6 +9,7 @@ class ActivityData{
   String fullname;
   String date;
   String phone;
+  String trxid;
 
   String activity;
 
@@ -22,6 +23,8 @@ class ActivityData{
       this.fullname,
       this.date,
       this.phone,
+
+      this.trxid,
       this.activity
     }
   );
@@ -34,6 +37,7 @@ class ActivityData{
       fullname: json['debit'].toString(),
       date: json['transaction_time'].toString(),
       phone: json['phone_number'].toString(),
+      trxid: json['reference_number'].toString(),
       activity: json['activity'].toString(),
       
       

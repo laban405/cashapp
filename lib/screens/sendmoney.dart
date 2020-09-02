@@ -22,12 +22,12 @@ class _SendMoneyState extends State<SendMoney> {
   final NativeContactPicker _contactPicker = NativeContactPicker();
   Contact _contact;
   final NumpadController _numpadController =
-      NumpadController(hintText: "Enter amount",format: NumpadFormat.NONE);
+      NumpadController(hintText: "Enter amount", format: NumpadFormat.NONE);
   bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    final BalanceBloc balanceBloc=Provider.of<BalanceBloc>(context);
+    final BalanceBloc balanceBloc = Provider.of<BalanceBloc>(context);
     return Scaffold(
       backgroundColor: dark1,
       appBar: AppBar(
@@ -56,9 +56,7 @@ class _SendMoneyState extends State<SendMoney> {
                 ),
               ),
             ),
-            Expanded(
-                flex: 1,
-                child: Container())
+            Expanded(flex: 1, child: Container())
           ],
         ),
       ),
@@ -90,7 +88,6 @@ class _SendMoneyState extends State<SendMoney> {
                               : '  CHANGE RECIPIENT',
                           textScaleFactor: 1,
                           style: TextStyle(
-
                               fontSize: 1.8 * textm,
                               color: Colors.grey[600],
                               fontWeight: FontWeight.w700),
@@ -174,13 +171,13 @@ class _SendMoneyState extends State<SendMoney> {
     );
   }
 
-  sendVirtualMoney( BalanceBloc balanceBloc) async {
+  sendVirtualMoney(BalanceBloc balanceBloc) async {
     setState(() {
       _isLoading = true;
     });
 
-    var phone_number=_contact.phoneNumber.replaceAll(new RegExp(r"\s+"), "");
-    var payeephone=phone_number.replaceAll(new RegExp(r'[^\w\s]+'),'');
+    var phone_number = _contact.phoneNumber.replaceAll(new RegExp(r"\s+"), "");
+    var payeephone = phone_number.replaceAll(new RegExp(r'[^\w\s]+'), '');
 
     try {
       var data = {
@@ -190,8 +187,8 @@ class _SendMoneyState extends State<SendMoney> {
       };
       print('data is $data');
 
-      var res =
-          await postData(data, 'send-money').timeout(const Duration(seconds: 30));
+      var res = await postData(data, 'send-money')
+          .timeout(const Duration(seconds: 30));
       var body = json.decode(res.body);
 
       print('send money response is ${res.body}');
@@ -199,22 +196,24 @@ class _SendMoneyState extends State<SendMoney> {
       if (res.statusCode == 200) {
         var _res = await getData('users');
         var profilebody = json.decode(_res.body);
+        profilebody = profilebody['content'][0];
 
         print('profile status code ${res.statusCode}');
+        print('account balance${profilebody['account_balance']}');
 
-        if(_res.statusCode==200) {
+        if (_res.statusCode == 200) {
           balanceBloc.updateBalance(profilebody['account_balance']);
         }
         showToast(context, '${body['message']}');
       } else {
-
         var _res = await getData('users');
         var profilebody = json.decode(_res.body);
+        profilebody = profilebody['content'][0];
 
         print('profile status code ${_res.statusCode}');
         print('profile data $profilebody');
 
-        if(_res.statusCode==200) {
+        if (_res.statusCode == 200) {
           balanceBloc.updateBalance(profilebody['account_balance']);
         }
         showToast(context, '${body['message']}');

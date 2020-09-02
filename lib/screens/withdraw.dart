@@ -167,6 +167,7 @@ class _WithdrawMoneyState extends State<WithdrawMoney> {
       if (res.statusCode == 200) {
         var _res = await getData('users');
         var profilebody = json.decode(_res.body);
+        profilebody=profilebody['content'][0];
 
         print('profile status code ${res.statusCode}');
 

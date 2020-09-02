@@ -192,11 +192,12 @@ class _PayMoneyState extends State<PayMoney> {
       await postData(data, 'pay-money').timeout(const Duration(seconds: 30));
       var body = json.decode(res.body);
 
-      print('send money response is ${res.body}');
-      print('send money response is ${res.statusCode}');
+      print('pay money response is ${res.body}');
+      print('pay money response is ${res.statusCode}');
       if (res.statusCode == 200) {
         var _res = await getData('users');
         var profilebody = json.decode(_res.body);
+        profilebody=profilebody['content'][0];
 
         print('profile status code ${res.statusCode}');
 
@@ -205,6 +206,16 @@ class _PayMoneyState extends State<PayMoney> {
         }
         showToast(context, '${body['message']}');
       } else {
+        var _res = await getData('users');
+        var profilebody = json.decode(_res.body);
+        profilebody = profilebody['content'][0];
+
+        print('profile status code ${_res.statusCode}');
+        print('profile data $profilebody');
+
+        if (_res.statusCode == 200) {
+          balanceBloc.updateBalance(profilebody['account_balance']);
+        }
         showToast(context, '${body['message']}');
       }
     } on TimeoutException {
