@@ -44,6 +44,8 @@ dependencies:
   flutter_overlay_loader: ^0.0.2
   provider: ^4.3.2
   flutter_email_sender: ^3.0.1
+  time_machine: ^0.9.13
+  intl: ^0.16.1
 
   
 

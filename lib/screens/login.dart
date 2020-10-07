@@ -17,6 +17,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
+  static const String route = '/login';
   @override
   _LoginState createState() => _LoginState();
 }
@@ -220,7 +221,7 @@ class _LoginState extends State<Login> {
             .timeout(const Duration(seconds: 30));
         //print('access token response: $res');
         if (res != null) {
-          var _res = await getData('users');
+          var _res = await getData('users?pageNo=0&pageSize=10');
           print('profile data ${_res.body}');
 
           var profilebody = json.decode(_res.body);

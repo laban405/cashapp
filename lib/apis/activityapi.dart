@@ -51,9 +51,10 @@ class ActivityData{
 
 
 Future<List<ActivityData>> fetchActivities() async {
-    var response = await getData('transactions-history');
+    var response = await getData('transactions-history?pageNumber=0&pageSize=1000');
    
     var res=json.decode(response.body);
+    print('get categories response>>>>>>> ${res}');
      print('get categories response ${res['content']}');
 
     try {

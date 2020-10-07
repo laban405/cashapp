@@ -15,71 +15,63 @@ class Reverse extends StatefulWidget {
 
 class _ReverseState extends State<Reverse> {
   Color _c = Colors.redAccent;
-  bool _isLoading =false;
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(backgroundColor: dark1,title: Text(
-      'Reverse transaction?',
-      style: TextStyle(
-        fontSize: 2 * textm,
-        color: Colors.white,
+    return AlertDialog(contentPadding: EdgeInsets.fromLTRB(5*widthm,5*widthm,5*widthm,3*widthm),
+      backgroundColor: dark1,
+      title: Text(
+        'Reverse transaction?',
+        style: TextStyle(
+          fontSize: 2 * textm,
+          color: Colors.white,
+        ),
       ),
-    ),
-//      content: Container(
-//        color: _c,
-//        height: 20.0,
-//        width: 20.0,
-//      ),
-      actions: <Widget>[
-        SizedBox(
-          height: 4*heightm,
-          width: 20*widthm,
-          child: FlatButton(
-              color: Colors.transparent,
-              child: Text('Cancel',
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          FlatButton(
+              color: blue1,
+              child: Text(
+                'Cancel',
                 style: TextStyle(
                   fontSize: 2 * textm,
-                  color: Colors.red,
+                  color: dark1,
                 ),
               ),
               onPressed: () {
                 Navigator.pop(context);
-              }
-              )
-
-        ),
-        SizedBox(
-          height: 4*heightm,
-          width: 20*widthm,
-          child: FlatButton(
-            color:Colors.transparent,
-              child:_isLoading?spinkitblue: Text('Reverse'),
+              }),
+          FlatButton(
+              color: Colors.red[50],
+              child: _isLoading
+                  ? SizedBox(height:3*heightm,child:spinkitblue)
+                  : Text(
+                      'Reverse',
+                      style: TextStyle(
+                        fontSize: 2 * textm,
+                        color: Colors.red[600],
+                      ),
+                    ),
               onPressed: () {
-              reverseVirtualMoney();
-    }
-              )
-        ),
-
-      ],
+                reverseVirtualMoney();
+              })
+        ],
+      ),
     );
   }
 
-  reverseVirtualMoney( ) async {
+  reverseVirtualMoney() async {
     setState(() {
       _isLoading = true;
     });
 
-
-
     try {
-      var data = {
-        "refund_narration": "Refund Money",
-        "trx_id": widget.trxid
-      };
+      var data = {"refund_narration": "Refund Money", "trx_id": widget.trxid};
       print('data is $data');
 
-      var res =
-      await postData(data, 'refund-transaction').timeout(const Duration(seconds: 30));
+      var res = await postData(data, 'refund-transaction')
+          .timeout(const Duration(seconds: 30));
       var body = json.decode(res.body);
 
       print('reverse money response is ${res.body}');
@@ -87,7 +79,7 @@ class _ReverseState extends State<Reverse> {
       if (res.statusCode == 200) {
         showToast(context, '${body['message']}');
 
-Navigator.pop(context);
+        Navigator.pop(context);
       } else {
         showToast(context, '${body['message']}');
       }

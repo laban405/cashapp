@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:cashapp/apis/activityapi.dart';
 import 'package:cashapp/res/constants.dart';
 import 'package:cashapp/screens/reverse.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:time_machine/time_machine.dart';
+import 'package:time_machine/time_machine_text_patterns.dart';
 
 class Activity extends StatefulWidget {
   @override
@@ -10,6 +14,23 @@ class Activity extends StatefulWidget {
 }
 
 class _ActivityState extends State<Activity> {
+
+  getLocalTime(var dateTime){
+
+    DateTime newdateTime = DateTime.parse(dateTime+"Z");
+
+
+    var dateLocal = newdateTime.toLocal();
+
+    print('local time $dateLocal');
+    return dateLocal;
+
+  }
+  @override
+  void initState() {
+
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,7 +103,10 @@ class _ActivityState extends State<Activity> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               ListTile(
-                  leading: data[index].debit <= 0 ? CircleAvatar(
+                  leading: data[index].debit <= 0 || data[index].activity=="Transaction Charges"
+                      || data[index].activity=="Withdrawal"
+                      || data[index].activity.contains("Refund Money")
+                      ? CircleAvatar(
                     backgroundColor: Colors.green,
                     child:  Icon(Icons.done,
                         color: Colors.white,
@@ -141,7 +165,7 @@ class _ActivityState extends State<Activity> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          '${data[index].date}',
+                          '${getLocalTime(data[index].date)}',
                           style: TextStyle(
                             fontSize: 1.8 * textm,
                             color: Colors.grey[500],

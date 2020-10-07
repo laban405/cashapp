@@ -10,7 +10,7 @@ final scaffoldKey = GlobalKey<ScaffoldState>();
 //spinkit
 final spinkitblue = SpinKitThreeBounce(
   color: blue1,
-  size: 20.0,
+  size: 5*widthm,
 );
 final spinkitblack = SpinKitThreeBounce(
   color: Colors.black,

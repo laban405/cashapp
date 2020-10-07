@@ -149,6 +149,7 @@ class _SendMoneyState extends State<SendMoney> {
                           onPressed: _isLoading
                               ? null
                               : () {
+                           // print("phone number $_contact");
                                   sendVirtualMoney(balanceBloc);
                                 },
                           child: _isLoading
@@ -175,51 +176,59 @@ class _SendMoneyState extends State<SendMoney> {
     setState(() {
       _isLoading = true;
     });
+   // print("phone number ${_contact.phoneNumber}");
+    if(_contact==null){
+      showToastRed(context, "No contact selected");
+    }else {
+      try {
+        var phone_number = _contact.phoneNumber.replaceAll(
+            new RegExp(r"\s+"), "");
+        var payeephone = phone_number.replaceAll(new RegExp(r'[^\w\s]+'), '');
 
-    var phone_number = _contact.phoneNumber.replaceAll(new RegExp(r"\s+"), "");
-    var payeephone = phone_number.replaceAll(new RegExp(r'[^\w\s]+'), '');
 
-    try {
-      var data = {
-        "amount": _numpadController.formattedString,
-        "narration": "Send Money to $payeephone",
-        "payee_phone_number": payeephone
-      };
-      print('data is $data');
+        var data = {
+          "amount": _numpadController.formattedString,
+          "narration": "Send Money to $payeephone",
+          "payee_phone_number": payeephone
+        };
+        print('data is $data');
 
-      var res = await postData(data, 'send-money')
-          .timeout(const Duration(seconds: 30));
-      var body = json.decode(res.body);
+        var res = await postData(data, 'send-money')
+            .timeout(const Duration(seconds: 30));
+        var body = json.decode(res.body);
 
-      print('send money response is ${res.body}');
-      print('send money response is ${res.statusCode}');
-      if (res.statusCode == 200) {
-        var _res = await getData('users');
-        var profilebody = json.decode(_res.body);
-        profilebody = profilebody['content'][0];
+        print('send money response is ${res.body}');
+        print('send money response is ${res.statusCode}');
+        if (res.statusCode == 200) {
+          var _res = await getData('users?pageNo=0&pageSize=10');
+          var profilebody = json.decode(_res.body);
+          profilebody = profilebody['content'][0];
 
-        print('profile status code ${res.statusCode}');
-        print('account balance${profilebody['account_balance']}');
+          print('profile status code ${res.statusCode}');
+          print('account balance${profilebody['account_balance']}');
 
-        if (_res.statusCode == 200) {
-          balanceBloc.updateBalance(profilebody['account_balance']);
+          if (_res.statusCode == 200) {
+            balanceBloc.updateBalance(profilebody['account_balance']);
+          }
+          showToast(context, '${body['message']}');
+        } else {
+          var _res = await getData('users?pageNo=0&pageSize=10');
+
+          var profilebody = json.decode(_res.body);
+          print('response>>>>>>profile>>>>>$profilebody');
+          profilebody = profilebody['content'][0];
+
+          print('profile status code ${_res.statusCode}');
+          print('profile data $profilebody');
+
+          if (_res.statusCode == 200) {
+            balanceBloc.updateBalance(profilebody['account_balance']);
+          }
+          showToast(context, '${body['message']}');
         }
-        showToast(context, '${body['message']}');
-      } else {
-        var _res = await getData('users');
-        var profilebody = json.decode(_res.body);
-        profilebody = profilebody['content'][0];
-
-        print('profile status code ${_res.statusCode}');
-        print('profile data $profilebody');
-
-        if (_res.statusCode == 200) {
-          balanceBloc.updateBalance(profilebody['account_balance']);
-        }
-        showToast(context, '${body['message']}');
+      } on TimeoutException {
+        showToast(context, 'Error: time out');
       }
-    } on TimeoutException {
-      showToast(context, 'Error: time out');
     }
 
     setState(() {

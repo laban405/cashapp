@@ -177,49 +177,54 @@ class _PayMoneyState extends State<PayMoney> {
       _isLoading = true;
     });
 
-    var phone_number=_contact.phoneNumber.replaceAll(new RegExp(r"\s+"), "");
-    var payeephone=phone_number.replaceAll(new RegExp(r'[^\w\s]+'),'');
+    if(_contact==null){
+      showToastRed(context, "No contact selected");
+    }else {
+      var phone_number = _contact.phoneNumber.replaceAll(
+          new RegExp(r"\s+"), "");
+      var payeephone = phone_number.replaceAll(new RegExp(r'[^\w\s]+'), '');
 
-    try {
-      var data = {
-        "amount": _numpadController.formattedString,
-        "narration": "Pay Money to $payeephone",
-        "payee_phone_number": payeephone
-      };
-      print('data is $data');
+      try {
+        var data = {
+          "amount": _numpadController.formattedString,
+          "narration": "Pay Money to $payeephone",
+          "payee_phone_number": payeephone
+        };
+        print('data is $data');
 
-      var res =
-      await postData(data, 'pay-money').timeout(const Duration(seconds: 30));
-      var body = json.decode(res.body);
+        var res =
+        await postData(data, 'pay-money').timeout(const Duration(seconds: 30));
+        var body = json.decode(res.body);
 
-      print('pay money response is ${res.body}');
-      print('pay money response is ${res.statusCode}');
-      if (res.statusCode == 200) {
-        var _res = await getData('users');
-        var profilebody = json.decode(_res.body);
-        profilebody=profilebody['content'][0];
+        print('pay money response is ${res.body}');
+        print('pay money response is ${res.statusCode}');
+        if (res.statusCode == 200) {
+          var _res = await getData('users?pageNo=0&pageSize=10');
+          var profilebody = json.decode(_res.body);
+          profilebody = profilebody['content'][0];
 
-        print('profile status code ${res.statusCode}');
+          print('profile status code ${res.statusCode}');
 
-        if(_res.statusCode==200) {
-          balanceBloc.updateBalance(profilebody['account_balance']);
+          if (_res.statusCode == 200) {
+            balanceBloc.updateBalance(profilebody['account_balance']);
+          }
+          showToast(context, '${body['message']}');
+        } else {
+          var _res = await getData('users?pageNo=0&pageSize=10');
+          var profilebody = json.decode(_res.body);
+          profilebody = profilebody['content'][0];
+
+          print('profile status code ${_res.statusCode}');
+          print('profile data $profilebody');
+
+          if (_res.statusCode == 200) {
+            balanceBloc.updateBalance(profilebody['account_balance']);
+          }
+          showToast(context, '${body['message']}');
         }
-        showToast(context, '${body['message']}');
-      } else {
-        var _res = await getData('users');
-        var profilebody = json.decode(_res.body);
-        profilebody = profilebody['content'][0];
-
-        print('profile status code ${_res.statusCode}');
-        print('profile data $profilebody');
-
-        if (_res.statusCode == 200) {
-          balanceBloc.updateBalance(profilebody['account_balance']);
-        }
-        showToast(context, '${body['message']}');
+      } on TimeoutException {
+        showToast(context, 'Error: time out');
       }
-    } on TimeoutException {
-      showToast(context, 'Error: time out');
     }
 
     setState(() {

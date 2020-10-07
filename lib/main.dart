@@ -1,11 +1,17 @@
 import 'package:cashapp/blocs/balance_bloc.dart';
 import 'package:cashapp/res/size_config.dart';
 import 'package:cashapp/screens/home.dart';
+import 'package:cashapp/screens/login.dart';
 import 'package:cashapp/screens/splashscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-void main() => runApp(MyApp());
+Future main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -21,12 +27,15 @@ class MyApp extends StatelessWidget {
           ],
           child: MaterialApp(
             title: 'Cash App',
+            debugShowCheckedModeBanner: false,
             theme: ThemeData(
               primarySwatch: Colors.blue,
             ),
-            home: SplashScreen(),
+            initialRoute: SplashScreen.route,
             routes: {
-             // Home.route: (context) => Home(),
+              Home.route: (context) => Home(),
+              Login.route: (context)=>Login(),
+              SplashScreen.route: (context)=>SplashScreen()
             },
           ),
         );

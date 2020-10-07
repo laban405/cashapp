@@ -11,6 +11,7 @@ import 'package:cashapp/screens/withdraw.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
+import 'home.dart';
 import 'login.dart';
 
 drawerFunction(BuildContext context) {
@@ -216,10 +217,10 @@ drawerFunction(BuildContext context) {
                             ),
                           ),
             onTap: () {
-               Navigator.pushReplacement(
-                   context,
-                   PageTransition(
-                       child: Login(), type: PageTransitionType.rightToLeft));
+              Navigator.pushAndRemoveUntil(context,
+                  MaterialPageRoute(builder: (BuildContext context) => Login()),
+                      (Route<dynamic> route) => route is Home
+              );
             },
           ),
         ],

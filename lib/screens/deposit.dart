@@ -1,22 +1,15 @@
 import 'dart:convert';
-
-import 'package:cashapp/apis/activityapi.dart';
 import 'package:cashapp/apis/httprequestsapi.dart';
 import 'package:cashapp/apis/profiledata.dart';
 import 'package:cashapp/blocs/balance_bloc.dart';
 import 'package:cashapp/res/constants.dart';
+import 'package:cashapp/widgets/commonwidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:flutter_numpad_widget/flutter_numpad_widget.dart';
 import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'home.dart';
-
-
-
 
 class Deposit extends StatefulWidget {
   @override
@@ -25,11 +18,12 @@ class Deposit extends StatefulWidget {
 
 class _DepositState extends State<Deposit> {
   final NumpadController _numpadController =
-  NumpadController(hintText: 'Enter amount',format: NumpadFormat.NONE);
+      NumpadController(hintText: 'Enter amount', format: NumpadFormat.NONE);
 
   static final String tokenizationKey = 'sandbox_rzdmq5vp_kyktcybpfgq5b99r';
   String clientToken;
-  bool isLoading=false;
+  bool isLoading = false;
+  var usdAmount;
   //double depositamt=20;
 
   getProfileData() async {
@@ -38,10 +32,9 @@ class _DepositState extends State<Deposit> {
       setState(() {
         balance = localStorage.getString('balance');
         phone = localStorage.getString('phone');
-        email=localStorage.getString('email');
-        lastlogin=localStorage.getString('lastlogin');
-        name=localStorage.getString('name');
-
+        email = localStorage.getString('email');
+        lastlogin = localStorage.getString('lastlogin');
+        name = localStorage.getString('name');
       });
 
       // print('my token is $mytoken');
@@ -50,35 +43,62 @@ class _DepositState extends State<Deposit> {
     }
   }
 
+  getClientToken() async {
+    var res = await getData('payment/token');
+    var body = json.decode(res.body);
+    clientToken = body['clientToken'];
+    print('response client token is $clientToken');
+  }
 
+  convertCurrency() async {
+    if (currency != "USD") {
+      var data = {
+        "base_currency": currency,
+        "conversion_amt": _numpadController.formattedString,
+        "quote_currency": "USD"
+      };
+      var res = await postData(
+        data,
+        'currency-converter',
+      );
+      var body = json.decode(res.body);
+      setState(() {
+        usdAmount = body['content'].toString();
+      });
 
+      print('currency convert response $body');
+      return usdAmount;
+    } else {
+      setState(() {
+        usdAmount = _numpadController.formattedString;
+      });
 
-  getClientToken()async{
-    var res= await getData('payment/token');
-    var body= json.decode(res.body);
-    print('response client token${body}');
+      return usdAmount;
+    }
+  }
 
-    clientToken=body['clientToken'];
-    print('client token is $clientToken');
+  getCurrency() async {
+    localStorage = await SharedPreferences.getInstance();
+    currency = localStorage.getString('currency');
   }
 
   @override
   void initState() {
     getClientToken();
+    getCurrency();
     // TODO: implement initState
     super.initState();
   }
 
-    @override
-    void dispose(){
+  @override
+  void dispose() {
     Loader.hide();
     super.dispose();
-    }
-
+  }
 
   @override
   Widget build(BuildContext context) {
-    final BalanceBloc balanceBloc=Provider.of<BalanceBloc>(context);
+    final BalanceBloc balanceBloc = Provider.of<BalanceBloc>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: dark1,
@@ -95,13 +115,12 @@ class _DepositState extends State<Deposit> {
 //             Navigator.push( context, MaterialPageRoute( builder: (context) => Home()), ).then((value) => setState(() {
 //               getProfileData();
 //             }));
-             Navigator.pop(context);
+              Navigator.pop(context);
 //              Navigator.push(
 //                  context, MaterialPageRoute(builder: (BuildContext context) => Home(
 //
 //              )));
-            }
-            ),
+            }),
         title: Row(
           children: <Widget>[
             Expanded(
@@ -116,127 +135,147 @@ class _DepositState extends State<Deposit> {
                 ),
               ),
             ),
-            Expanded(
-                flex: 1,
-                child: Container())
+            Expanded(flex: 1, child: Container())
           ],
         ),
       ),
       backgroundColor: dark1,
       body: SafeArea(
           child: Container(
-            child: Column(
-              children: <Widget>[
-
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding:  EdgeInsets.all(3*widthm),
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: NumpadText(
-                        style: TextStyle(fontSize: 5*textm, color: Colors.white),
-                        controller: _numpadController,
+              child: Column(
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.all(3 * widthm),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: NumpadText(
+                  style: TextStyle(fontSize: 5 * textm, color: Colors.white),
+                  controller: _numpadController,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Numpad(
+              controller: _numpadController,
+              buttonTextSize: 10 * widthm,
+              buttonColor: dark1,
+              textColor: Colors.white,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  3 * widthm,
+                  3 * widthm,
+                  3 * widthm,
+                  3 * widthm,
+                ),
+                child: SizedBox(
+                  height: 8 * heightm,
+                  width: MediaQuery.of(context).size.width / 2,
+                  child: FlatButton(
+                    color: blue1,
+                    onPressed: () async {
+                      print('currency convert start ');
+                      await convertCurrency();
+                      print('currency convert end ');
+                      print('braintree deposit start ');
+                      await brainTreeDeposit(balanceBloc);
+                      print('braintree deposit end ');
+                    },
+                    child: Text(
+                      'Add Funds',
+                      style: TextStyle(
+                        fontSize: 2.5 * textm,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 3,
-                  child: Numpad(
-                    controller: _numpadController,
-                    buttonTextSize: 10*widthm,
-                    buttonColor: dark1,
-                    textColor: Colors.white,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(3*widthm,
-                        3*widthm,
-                        3*widthm,
-                        3*widthm,
-                      ),
-                      child: SizedBox(
-                        height: 8 * heightm,
-                        width: MediaQuery.of(context).size.width/2,
-                        child: FlatButton(
-                          color: blue1,
-                          onPressed: () async {
-                            var request = BraintreeDropInRequest(
-                              cardEnabled: false,
-                              clientToken: clientToken,
-                              tokenizationKey: tokenizationKey,
-                              collectDeviceData: true,
+              )
+            ],
+          ),
+        ],
+      ))),
+    );
+  }
+
+  brainTreeDeposit(BalanceBloc balanceBloc) async {
+    print('<<<<<<<braintree deposit start >>>>>');
+
+    try {
+      print('<<<<<<<braintree request start request 1 >>>>>');
+      var request = BraintreeDropInRequest(
+        cardEnabled: false,
+        clientToken: clientToken,
+        tokenizationKey: tokenizationKey,
+        collectDeviceData: true,
 //                  googlePaymentRequest: BraintreeGooglePaymentRequest(
 //                    totalPrice: '4.20',
 //                    currencyCode: 'USD',
 //                    billingAddressRequired: false,
 //                  ),
-                              paypalRequest: BraintreePayPalRequest(
-                                currencyCode: 'USD',
-                                amount: _numpadController.formattedString,
-                                displayName: 'Junubi App',
-                              ),
-                            );
-                            BraintreeDropInResult result =
-                            await BraintreeDropIn.start(request);
-                            if (result != null) {
-                              print('result got back including nonce $result');
-                              showNonce(result.paymentMethodNonce, balanceBloc);
-                            }
-                          },
-                          child: Text(
-                            'Add Funds',
-                            style: TextStyle(
-                              fontSize: 2.5 * textm,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
+        paypalRequest: BraintreePayPalRequest(
+          currencyCode: "USD",
+          amount: usdAmount,
+          displayName: 'Junubi Safe Payments',
+        ),
+      );
 
-              ],
-            )
-          )),
-    );
+      print('<<<<<<<braintree request start request 1 end>>>>>');
+
+      print('<<<<<<<braintree request function start >>>>>');
+      BraintreeDropInResult result = await BraintreeDropIn.start(request);
+
+      if (result != null) {
+        print('result got back including nonce $result');
+        showNonce(result.paymentMethodNonce, balanceBloc);
+      }
+      print('<<<<<<<braintree request function end >>>>>');
+    } catch (e) {
+      print("braintree error$e");
+    }
   }
 
-
-  void showNonce(BraintreePaymentMethodNonce nonce, BalanceBloc balanceBloc) async{
-
-    print('nonce itself $nonce');
+  void showNonce(
+      BraintreePaymentMethodNonce nonce, BalanceBloc balanceBloc) async {
     print('start paypal deposit');
+    var res;
+    var body;
 
     Loader.show(
-
       context,
-      progressIndicator:
-      LinearProgressIndicator(backgroundColor: blue1),
+      progressIndicator: LinearProgressIndicator(backgroundColor: blue1),
       overlayColor: dark1,
     );
-    var res= await postNoData('make-payment?amount=${_numpadController.formattedString}&payment_method_nonce=${nonce.nonce}');
-    var body=json.decode(res.body);
-    print('response paypal is ${res.body}');
+    try {
+      res = await postNoData(
+          'make-payment?amount=${usdAmount}&payment_method_nonce=${nonce.nonce}');
+      body = json.decode(res.body);
+      print('response paypal is>>>>> ${res.body}');
+    } catch (e) {
+      showToast(context, "An Error Occurred");
+    }
 
 
-    if(res.statusCode==200){
-      var _res = await getData('users');
+    if (res.statusCode == 200) {
+
+      var _res = await getData('users?pageNo=0&pageSize=10');
       var profilebody = json.decode(_res.body);
+      print('profile data>>> $profilebody');
+      profilebody = profilebody['content'][0];
 
       print('profile status code ${res.statusCode}');
 
-      if(_res.statusCode==200) {
+      if (_res.statusCode == 200) {
         balanceBloc.updateBalance(profilebody['account_balance']);
       }
-
-
-
 
       Loader.hide();
       showDialog(
@@ -264,7 +303,8 @@ class _DepositState extends State<Deposit> {
                 ),
               ),
               Text(
-                '\$ ${body['content']['credit'].toString()}',
+               // '$currency ${body['content']['credit'].toString()}',
+                '$currency  ${_numpadController.formattedString}',
                 style: TextStyle(
                   fontSize: 3 * textm,
                   color: Colors.white,
@@ -281,34 +321,32 @@ class _DepositState extends State<Deposit> {
                 height: 10,
               ),
               SizedBox(
-                height: 6*heightm,
-                width: 40*widthm,
+                height: 6 * heightm,
+                width: 40 * widthm,
                 child: FlatButton(
                   color: dark1,
-                  onPressed: (){
+                  onPressed: () {
                     Navigator.pop(context);
                     //Navigator.pushReplacement(context, newRoute)
-
                   },
-                  child:Text(
+                  child: Text(
                     'Finish',
                     style: TextStyle(
-                      fontSize: 1.8* textm,
+                      fontSize: 1.8 * textm,
                       color: blue1,
                     ),
-                  ),),
+                  ),
+                ),
               )
             ],
           ),
         ),
       );
-
-    }else{
-
+    } else {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: Center(child: Text('Add Funds Successful')),
+          title: Center(child: Text('Add Funds Unsuccessful')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -320,37 +358,28 @@ class _DepositState extends State<Deposit> {
                   color: Colors.white,
                 ),
               ),
-
-
               SizedBox(
-                height: 3*heightm,
-                width: 10*widthm,
+                height: 3 * heightm,
+                width: 10 * widthm,
                 child: FlatButton(
                   color: dark1,
-                  onPressed: (){
+                  onPressed: () {
                     Navigator.pop(context);
-
                   },
-                  child:Text(
+                  child: Text(
                     'Finish',
                     style: TextStyle(
                       fontSize: 1.8 * textm,
-                      color:blue1,
+                      color: blue1,
                     ),
-                  ),),
+                  ),
+                ),
               )
             ],
           ),
         ),
       );
-
     }
     print('end paypal deposit');
-
   }
-
-
-  
-
-
 }

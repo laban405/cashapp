@@ -7,6 +7,7 @@ import 'package:cashapp/screens/login.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
+  static const String route = '/splashscreen';
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
