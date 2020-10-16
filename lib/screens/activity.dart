@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cashapp/apis/activityapi.dart';
+import 'package:cashapp/apis/profiledata.dart';
 import 'package:cashapp/res/constants.dart';
 import 'package:cashapp/screens/reverse.dart';
 import 'package:flutter/material.dart';
@@ -139,7 +140,7 @@ class _ActivityState extends State<Activity> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          '\$ ${data[index].debit <= 0 ? data[index].credit.toString() : data[index].debit.toString()}',
+                          '$currency ${data[index].debit <= 0 ? data[index].credit.toString() : data[index].debit.toString()}',
                           style: TextStyle(
                             fontSize: 2* textm,
                             fontWeight: FontWeight.w800,
