@@ -256,7 +256,7 @@ class _DepositState extends State<Deposit> {
     );
     try {
       res = await postNoData(
-          'make-payment?amount=${usdAmount}&payment_method_nonce=${nonce.nonce}');
+          'make-payment?amount=${usdAmount}&payment_method_nonce=${nonce.nonce}&exchageRate=$&unconvertedAmt=&${_numpadController.formattedString}');
       body = json.decode(res.body);
       print('response paypal is>>>>> ${res.body}');
     } catch (e) {
