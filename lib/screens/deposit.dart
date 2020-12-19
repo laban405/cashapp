@@ -24,6 +24,7 @@ class _DepositState extends State<Deposit> {
   String clientToken;
   bool isLoading = false;
   var usdAmount;
+  var fxRate=1.0;
   //double depositamt=20;
 
   getProfileData() async {
@@ -62,8 +63,11 @@ class _DepositState extends State<Deposit> {
         'currency-converter',
       );
       var body = json.decode(res.body);
+
+      print('converted currency $body');
       setState(() {
-        usdAmount = body['content'].toString();
+        usdAmount = body['content'][0]['converted_amt'].toString();
+        fxRate=body['content'][0]['converted_amt'];
       });
 
       print('currency convert response $body');
@@ -255,8 +259,10 @@ class _DepositState extends State<Deposit> {
       overlayColor: dark1,
     );
     try {
+      ///redo changes here
+    print('unconverted amt ${_numpadController.formattedString}');
       res = await postNoData(
-          'make-payment?amount=${usdAmount}&payment_method_nonce=${nonce.nonce}&exchageRate=$&unconvertedAmt=&${_numpadController.formattedString}');
+          'make-payment?amount=${usdAmount.toString()}&exchageRate=$fxRate&payment_method_nonce=${nonce.nonce}&unconvertedAmt=${_numpadController.formattedString}');
       body = json.decode(res.body);
       print('response paypal is>>>>> ${res.body}');
     } catch (e) {

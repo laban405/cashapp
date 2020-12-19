@@ -140,7 +140,7 @@ class _ActivityState extends State<Activity> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          '$currency ${data[index].debit <= 0 ? data[index].credit.toString() : data[index].debit.toString()}',
+                          '$currency ${data[index].debit <= 0 ? data[index].uncovertedAmt.toString() : data[index].uncovertedAmt.toString()}',
                           style: TextStyle(
                             fontSize: 2* textm,
                             fontWeight: FontWeight.w800,

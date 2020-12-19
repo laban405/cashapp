@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-final String ipaddress="http://54.202.230.57:8081/";
-final String _ipaddress = "http://54.202.230.57:8081";
+final String ipaddress="https://www.junubicash.com:8081/";
+final String _ipaddress = "https://www.junubicash.com:8081";
 final String _contextPath = '/api/';
 final String _url = _ipaddress + _contextPath;
 
@@ -11,8 +11,8 @@ var accesstoken;
 String deleteitemid;
 
 Future<String> requestToken(String phonev, String passwordv) async {
-  String username = 'testjwtclientid';
-  String password = 'XY7kmzoNzl100';
+  String username = 'JunubiCash';
+  String password = 'MaYzkSl100kmzoNz';
   String basicAuth =
       'Basic ' + base64Encode(utf8.encode('$username:$password'));
   //print('Basic auth $basicAuth');

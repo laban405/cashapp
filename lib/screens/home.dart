@@ -163,6 +163,7 @@ class _HomeState extends State<Home> {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(2 * widthm)),
                             gradient: LinearGradient(
+
                                 colors: [blue2, blue1],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter),

@@ -12,6 +12,7 @@ class ActivityData{
   String trxid;
 
   String activity;
+  String uncovertedAmt;
 
 
 
@@ -25,7 +26,8 @@ class ActivityData{
       this.phone,
 
       this.trxid,
-      this.activity
+      this.activity,
+      this.uncovertedAmt
     }
   );
 
@@ -39,6 +41,8 @@ class ActivityData{
       phone: json['phone_number'].toString(),
       trxid: json['reference_number'].toString(),
       activity: json['activity'].toString(),
+        uncovertedAmt: json['uncoverted_amt'].toString(),
+
       
       
     );
